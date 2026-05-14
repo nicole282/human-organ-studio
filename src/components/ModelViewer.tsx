@@ -1,0 +1,155 @@
+import { Suspense, useRef, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { ContactShadows, Environment, OrbitControls } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import type { OrganModel } from '../data/organs';
+import { useModel } from '../hooks/useModel';
+import { ModelScene } from './ModelScene';
+import { ProgressOverlay } from './ProgressOverlay';
+
+interface Props {
+  organ: OrganModel;
+}
+
+export function ModelViewer({ organ }: Props) {
+  const { status, progress, entry } = useModel(organ.modelUrl, {
+    autoStart: true,
+    fileSize: organ.fileSize,
+  });
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const isReady = status === 'done' && !!entry?.gltf;
+
+  const handleReset = () => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    controls.target.set(0, 0, 0);
+    controls.object.position.set(0, 0, 4.8);
+    controls.update();
+  };
+
+  return (
+    <div className="viewer">
+      <Canvas
+        shadows="percentage"
+        dpr={[1, 2]}
+        camera={{ position: [0, 0, 4.8], fov: 42 }}
+        gl={{ antialias: true, preserveDrawingBuffer: true }}
+      >
+        <ambientLight intensity={0.58} />
+        <directionalLight
+          position={[5, 6, 4]}
+          intensity={1.15}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+        />
+        <directionalLight position={[-3, 2, -4]} intensity={0.35} />
+
+        <Suspense fallback={null}>
+          <Environment preset="studio" environmentIntensity={0.55} />
+        </Suspense>
+
+        {isReady && entry?.gltf && (
+          <ModelScene
+            organ={organ}
+            gltf={entry.gltf}
+            autoRotate={autoRotate}
+            showLabels={showLabels}
+            initialRotationY={organ.defaultRotationY}
+            displayScale={organ.displayScale}
+          />
+        )}
+
+        <ContactShadows
+          position={[0, -1.35, 0]}
+          opacity={0.26}
+          scale={6}
+          blur={2.6}
+          far={3.2}
+        />
+
+        <OrbitControls
+          ref={controlsRef}
+          makeDefault
+          enableDamping
+          dampingFactor={0.08}
+          minDistance={1.6}
+          maxDistance={9}
+          autoRotate={false}
+        />
+      </Canvas>
+
+      <div className="overlay-heading">
+        <h2 className="overlay-title">{organ.name}</h2>
+        <p className="overlay-sub">{organ.subtitle}</p>
+      </div>
+
+      <p className="overlay-tip" aria-hidden="true">
+        拖拽旋转 · 滚轮缩放 · 右键平移
+      </p>
+
+      <div className="overlay-toolbar">
+        <button
+          type="button"
+          className={`tool-btn${autoRotate ? ' active' : ''}`}
+          onClick={() => setAutoRotate((value) => !value)}
+        >
+          <RotateIcon />
+          {autoRotate ? '暂停旋转' : '自动旋转'}
+        </button>
+        <button
+          type="button"
+          className={`tool-btn${showLabels ? ' active' : ''}`}
+          onClick={() => setShowLabels((value) => !value)}
+        >
+          <TagIcon />
+          {showLabels ? '隐藏标签' : '显示标签'}
+        </button>
+        <button type="button" className="tool-btn" onClick={handleReset}>
+          <ResetIcon />
+          复位视角
+        </button>
+      </div>
+
+      {!isReady && (
+        <ProgressOverlay
+          progress={progress}
+          status={status}
+          modelName={organ.name}
+          error={entry?.error}
+        />
+      )}
+    </div>
+  );
+}
+
+function RotateIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-3-6.7" />
+      <polyline points="21 4 21 10 15 10" />
+    </svg>
+  );
+}
+
+function TagIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z" />
+      <circle cx="7.5" cy="7.5" r="1.5" />
+    </svg>
+  );
+}
+
+function ResetIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 12 6 9 9 12" />
+      <path d="M6 9v6a6 6 0 0 0 6 6h3" />
+      <path d="M21 12l-3 3-3-3" />
+      <path d="M18 15V9a6 6 0 0 0-6-6H9" />
+    </svg>
+  );
+}

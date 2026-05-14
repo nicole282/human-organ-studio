@@ -1,0 +1,104 @@
+:root {
+  --bg-cream: #eef4f6;
+  --bg-paper: #f7fafb;
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-soft: rgba(245, 250, 252, 0.72);
+  --bg-deep: #dfe9ed;
+
+  --ink-900: #2c2a2e;
+  --ink-700: #4a4753;
+  --ink-500: #6f6b78;
+  --ink-300: #aaa5b3;
+
+  --accent: #d95f6f;
+  --accent-deep: #994654;
+  --plum: #5f67a8;
+  --rose: #c46b7a;
+  --amber: #c98a3a;
+  --sky: #5b8db8;
+
+  --border-soft: rgba(70, 60, 80, 0.08);
+  --border-strong: rgba(70, 60, 80, 0.18);
+  --shadow-soft: 0 12px 32px -16px rgba(70, 60, 80, 0.18),
+    0 2px 6px -2px rgba(70, 60, 80, 0.08);
+  --shadow-card: 0 22px 60px -30px rgba(70, 60, 80, 0.22),
+    0 4px 14px -4px rgba(70, 60, 80, 0.08);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --font-sans: 'Noto Sans SC', system-ui, 'Helvetica Neue', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  --font-serif: 'Noto Serif SC', 'STSong', 'Songti SC', Georgia, serif;
+  --font-hand: 'Caveat', 'Noto Serif SC', cursive;
+
+  color-scheme: light;
+  color: var(--ink-700);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  background:
+    linear-gradient(135deg, rgba(217, 95, 111, 0.08), transparent 34%),
+    linear-gradient(225deg, rgba(90, 167, 184, 0.11), transparent 38%),
+    linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-paper) 100%);
+  color: var(--ink-700);
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--ink-900);
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(70, 60, 80, 0.18);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
